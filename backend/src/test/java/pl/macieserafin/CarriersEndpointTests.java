@@ -283,7 +283,7 @@ class CarriersEndpointTests {
         assertEquals("TEST-3", proposals.get(2).get("trainNumber").asText());
         assertEquals(30, proposals.get(2).get("bufferMinutes").asInt());
         assertEquals(1, result.size());
-        assertEquals(6, proposals.get(0).size());
+        assertEquals(10, proposals.get(0).size());
         assertTrue(scheduleQuery.get().contains("fromStations=5900"));
         assertTrue(scheduleQuery.get().contains("toStations=7500"));
         assertTrue(scheduleQuery.get().contains("dateFrom=2026-10-15"));
@@ -409,8 +409,49 @@ class CarriersEndpointTests {
             assertEquals("ALL", proposals.get(i).get("type").asText());
             assertEquals("TEST-" + (4 - i), proposals.get(i).get("trainNumber").asText());
             assertEquals(i * 10, proposals.get(i).get("bufferMinutes").asInt());
-            assertEquals(6, proposals.get(i).size());
+            assertEquals(10, proposals.get(i).size());
         }
+    }
+
+    @Test
+    void returnsPlatformAndTrackForBothEndsWithArrivalFallback() throws Exception {
+        String route = route(1, "2026-10-16", "07:30:00", "07:59:00", 0, 0, 1, 2, null, null)
+                .replace("\"departureTime\":", "\"departurePlatform\":\"1\",\"departureTrack\":\"502\",\"departureTime\":")
+                .replace("\"arrivalTime\":", "\"departurePlatform\":\"3\",\"departureTrack\":\"501\",\"arrivalTime\":");
+        String path = connectionPath("Gdynia Główna", "Gdańsk Główny", "2026-10-16T08:00");
+        for (String mode : new String[]{"recommended", "all"}) {
+            scheduleBody.set(routes(route));
+            var response = get(path + "&mode=" + mode);
+            assertEquals(200, response.statusCode(), response.body());
+            var proposal = json.readTree(response.body()).get("proposals").get(0);
+            assertEquals("1", proposal.get("departurePlatform").asText());
+            assertEquals("502", proposal.get("departureTrack").asText());
+            assertEquals("3", proposal.get("arrivalPlatform").asText());
+            assertEquals("501", proposal.get("arrivalTrack").asText());
+        }
+        scheduleBody.set(routes(route.replace("\"arrivalTime\":",
+                "\"arrivalPlatform\":\"4\",\"arrivalTrack\":\"7\",\"arrivalTime\":")));
+        var proposal = json.readTree(get(path).body()).get("proposals").get(0);
+        assertEquals("4", proposal.get("arrivalPlatform").asText());
+        assertEquals("7", proposal.get("arrivalTrack").asText());
+    }
+
+    @Test
+    void allModeReturnsPrAndSkmTogether() throws Exception {
+        scheduleBody.set(routes(
+                route(1, "2026-10-16", "07:30:00", "07:59:00", 0, 0, 1, 2, null, null)
+                        .replace("\"carrierCode\":\"SKMT\"", "\"carrierCode\":\"PR\""),
+                route(2, "2026-10-16", "07:10:00", "07:55:00", 0, 0, 1, 2, null, null),
+                route(3, "2026-10-16", "07:00:00", "07:47:00", 0, 0, 1, 2, null, null)
+                        .replace("\"carrierCode\":\"SKMT\"", "\"carrierCode\":\"PR\"")));
+        var response = get(connectionPath("Gdynia Główna", "Gdańsk Główny", "2026-10-16T08:00") + "&mode=all");
+        assertEquals(200, response.statusCode(), response.body());
+        var proposals = json.readTree(response.body()).get("proposals");
+        assertEquals(3, proposals.size());
+        assertEquals("PR", proposals.get(0).get("carrierCode").asText());
+        assertEquals("SKMT", proposals.get(1).get("carrierCode").asText());
+        assertEquals("PR", proposals.get(2).get("carrierCode").asText());
+        assertTrue(scheduleQuery.get().contains("carriersInclude=PR,SKMT"));
     }
 
     @Test

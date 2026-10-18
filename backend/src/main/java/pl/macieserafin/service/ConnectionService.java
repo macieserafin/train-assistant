@@ -97,7 +97,14 @@ public class ConnectionService {
         if (number == null || number.isBlank()) number = candidate.route().nationalNumber();
         return new Proposal(type, number, candidate.route().carrierCode(),
                 candidate.departure(), candidate.arrival(),
-                Duration.between(candidate.arrival(), arrivalBefore).toMinutes());
+                Duration.between(candidate.arrival(), arrivalBefore).toMinutes(),
+                candidate.start().departurePlatform(), candidate.start().departureTrack(),
+                arrivalValue(candidate.end().arrivalPlatform(), candidate.end().departurePlatform()),
+                arrivalValue(candidate.end().arrivalTrack(), candidate.end().departureTrack()));
+    }
+
+    private String arrivalValue(String arrival, String departure) {
+        return arrival == null || arrival.isBlank() ? departure : arrival;
     }
 
     private void validateRoute(Route route) {

@@ -1,0 +1,51 @@
+#settings {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fafbf8;
+  margin-bottom: 18px;
+}
+
+summary {
+  cursor: pointer;
+  padding: 17px 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+summary::marker {
+  color: #7b8a7b;
+}
+
+.settings-body {
+  padding: 4px 20px 8px;
+}
+
+.options {
+  display: grid;
+  gap: 4px;
+  margin-top: 5px;
+  max-height: 230px;
+  overflow: auto;
+}
+
+.options button {
+  text-align: left;
+  font-size: 13px;
+  padding: 10px;
+}
+
+.options:empty {
+  display: none;
+}
+
+[id$="-status"]:empty {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .settings-body .grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+}

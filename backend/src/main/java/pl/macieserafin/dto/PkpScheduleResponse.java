@@ -12,5 +12,6 @@ public record PkpScheduleResponse(List<Route> routes) {
                        Integer arrivalDay, String arrivalTime,
                        Integer departureDay, String departureTime,
                        String departureTrainNumber, String departurePlatform,
-                       String arrivalPlatform, Integer stopTypeId) {}
+                       String arrivalPlatform, String departureTrack,
+                       String arrivalTrack, Integer stopTypeId) {}
 }

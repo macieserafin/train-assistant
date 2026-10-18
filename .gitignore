@@ -40,5 +40,5 @@ api-key-*.txt
 .env.*
 !.env.example
 
-# macOS
+# macOS — ignoruj we wszystkich katalogach repozytorium
 .DS_Store

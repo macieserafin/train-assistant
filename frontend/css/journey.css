@@ -1,0 +1,147 @@
+#journey {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 3px 12px #24392c05;
+}
+
+fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.route {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 26px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.route .hint, .route strong {
+  display: block;
+}
+
+.route .hint {
+  margin-bottom: 7px;
+}
+
+.route strong {
+  overflow-wrap: anywhere;
+  font-size: 18px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: -.3px;
+}
+
+#swap-direction {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #f5f7f1;
+  font-size: 23px;
+}
+
+#swap-direction:hover:not(:disabled) {
+  background: #e5eddf;
+}
+
+.when input {
+  font-variant-numeric: tabular-nums;
+}
+
+.primary {
+  background: var(--green);
+  color: white;
+  width: 100%;
+  margin-top: 20px;
+  font-weight: 600;
+  min-height: 50px;
+  border-color: var(--green);
+}
+
+.primary:hover {
+  background: #244b34;
+}
+
+.search-mode {
+  margin-top: 26px;
+}
+
+.mode-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.mode-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  padding: 13px 12px;
+  font-weight: 400;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.mode-option:has(input:checked) {
+  background: #edf3e9;
+  border-color: #799773;
+  color: #2c5136;
+}
+
+.mode-option input {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--green);
+}
+
+.search-mode .hint {
+  margin: 10px 0 0;
+}
+
+@media (max-width: 480px) {
+  #journey {
+    padding: 20px 16px;
+  }
+
+  .route {
+    gap: 12px;
+    grid-template-columns: minmax(0, 1fr) 38px minmax(0, 1fr);
+  }
+
+  .route strong {
+    font-size: 15px;
+  }
+
+  #swap-direction {
+    width: 38px;
+    height: 38px;
+  }
+
+  .when {
+    gap: 10px;
+  }
+
+  .mode-options {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+}

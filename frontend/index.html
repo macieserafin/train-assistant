@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>
+      Train Assistant
+    </title>
+    <link rel="stylesheet" href="css/style.css">
+    <script type="module" src="js/app.js">
+    </script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="3" width="14" height="15" rx="4"/>
+            <path d="M5 11h14M12 3v8M8 18l-2 3m10-3 2 3M9 15h.01M15 15h.01"/>
+          </svg>
+        </span>
+        <div>
+          <h1>train-assistant</h1>
+          <p>Sprawdź połączenia na swojej trasie.</p>
+        </div>
+      </header>
+      <details id="settings" open>
+        <summary>
+          Domyślne stacje
+        </summary>
+        <div class="settings-body">
+          <div class="grid">
+            <div>
+              <label for="first">
+                Stacja 1
+              </label>
+              <input id="first" type="search" placeholder="np. Gdynia Główna" autocomplete="off" maxlength="100" aria-describedby="first-status">
+              <div id="first-options" class="options">
+              </div>
+              <p id="first-status" class="hint" role="status">
+              </p>
+            </div>
+            <div>
+              <label for="second">
+                Stacja 2
+              </label>
+              <input id="second" type="search" placeholder="np. Gdańsk Przymorze-Uniwersytet" autocomplete="off" maxlength="100" aria-describedby="second-status">
+              <div id="second-options" class="options">
+              </div>
+              <p id="second-status" class="hint" role="status">
+              </p>
+            </div>
+          </div>
+          <p class="hint" id="saved" role="status">
+            Stacje zapamiętam w tej przeglądarce.
+          </p>
+        </div>
+      </details>
+      <form id="journey">
+        <div class="route" aria-live="polite">
+          <div>
+            <span class="hint">Skąd</span>
+            <strong id="route-from">Wybierz stację</strong>
+          </div>
+          <button type="button" id="swap-direction" aria-label="Zamień stację odjazdu i przyjazdu" title="Zamień kierunek" disabled>
+            ⇄
+          </button>
+          <div>
+            <span class="hint">Dokąd</span>
+            <strong id="route-to">Wybierz stację</strong>
+          </div>
+        </div>
+        <div class="grid when">
+          <div>
+            <label for="date">Data podróży</label>
+            <input id="date" type="date" required>
+          </div>
+          <div>
+            <label for="time">Przyjazd najpóźniej o</label>
+            <input id="time" type="time" value="08:00" required>
+          </div>
+        </div>
+        <fieldset class="search-mode">
+          <legend>Pokaż połączenia</legend>
+          <div class="mode-options">
+          <label class="mode-option">
+            <input type="radio" name="mode" value="recommended" checked>
+            3 proponowane
+          </label>
+          <label class="mode-option">
+            <input type="radio" name="mode" value="all">
+            Wszystkie · 30 min
+          </label>
+          </div>
+          <p class="hint">30 min liczymy przed wybraną godziną przyjazdu, np. 7:30–8:00.</p>
+        </fieldset>
+        <button class="primary" id="search" type="submit">
+          Znajdź pociąg
+        </button>
+      </form>
+      <section aria-label="Połączenia" aria-busy="false" id="results">
+        <p id="message" role="status">
+        </p>
+        <div id="connections">
+        </div>
+      </section>
+      <footer>
+        <a href="https://macieserafin.pl">macieserafin.pl</a>
+      </footer>
+    </main>
+  </body>
+</html>
