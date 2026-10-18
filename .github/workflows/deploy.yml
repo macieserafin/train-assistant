@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 25
     env:
       RELEASE_SHA: ${{ github.sha }}
-      TRAIN_ENV_FILE: ${{ runner.temp }}/train-assistant.env
+      TRAIN_ENV_FILE: /tmp/train-assistant-ci.env
     steps:
       - uses: actions/checkout@v4
       - name: Build image and run frontend and backend tests
