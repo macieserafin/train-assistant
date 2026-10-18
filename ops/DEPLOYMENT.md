@@ -5,12 +5,12 @@ wspólny frontend WWW oraz backend. Budowanie uruchamia testy Node i Maven;
 nieudane testy zatrzymują wdrożenie. Pull request tylko buduje i testuje obraz.
 
 Na VPS wysyłany jest obraz z tagiem SHA commita oraz pliki Compose i skrypt
-wdrożeniowy. Każde wydanie ma katalog `~/train-assistant/releases/SHA`.
+wdrożeniowy. Każde wydanie ma katalog `~/apps/train-assistant/releases/SHA`.
 Kontener ma osobny projekt Compose `train-assistant` i port
 `127.0.0.1:18080`. Nginx obsługuje HTTPS dla `train.macieserafin.pl` i przekazuje
 tam stronę oraz `/api/*`. Inne projekty Compose pozostają niezależne.
 
-`~/train-assistant/.env` zawiera klucz PKP i pozostaje wyłącznie na VPS-ie.
+`~/apps/train-assistant/.env` zawiera klucz PKP i pozostaje wyłącznie na VPS-ie.
 Nie jest częścią obrazu, artefaktów GitHub ani repozytorium. Wersja WWW używa
 względnych adresów `/api`; aplikacja iOS powinna być budowana z
 `API_BASE_URL=https://train.macieserafin.pl` w `frontend/.env`.
@@ -36,7 +36,7 @@ Symlink `current` wskazuje ostatnie pomyślne lokalne wdrożenie.
 Ręczne przywrócenie zachowanego SHA na VPS:
 
 ```sh
-bash ~/train-assistant/releases/SHA/deploy.sh SHA
+bash ~/apps/train-assistant/current/deploy.sh SHA
 ```
 
 Diagnostyka na VPS:
@@ -60,3 +60,14 @@ nie obsługuje przejścia profilu AppArmor kontenera przy `no-new-privileges:tru
 (w dzienniku jądra: `info="no new privs"`). Nie ustawiaj tej opcji: blokuje
 uruchomienie programu. Domyślny profil AppArmor, użytkownik bez roota,
 `cap_drop: ALL` i system plików tylko do odczytu pozostają aktywne.
+
+## Układ katalogów VPS
+
+Wszystkie aplikacje są w `~/apps/`. Train Assistant ma foldery `config/`
+(plik `.env` oraz odnośniki do Nginx i aktywnego Compose), `releases/` (wydania),
+`images/` (archiwa obrazów), `backups/` i `scripts/`. Plik `.env` w korzeniu
+aplikacji jest odnośnikiem do `config/.env`, zachowującym zgodność ze skryptami.
+Archiwum `releases/SHA/image.tar.gz` wskazuje na `images/SHA.tar.gz`.
+Działające obrazy i wolumeny baz pozostają w systemowym magazynie Dockera.
+Polecenie `~/apps/status.sh` pokazuje kontenery; `scripts/list-images.sh`
+w katalogu każdej aplikacji pokazuje jej obrazy.

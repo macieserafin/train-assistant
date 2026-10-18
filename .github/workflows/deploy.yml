@@ -85,9 +85,9 @@ jobs:
           target="$VPS_USER@$VPS_HOST"
           tar -czf - -C release image.tar.gz compose.prod.yml deploy.sh |
             ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$target" \
-              "umask 077; mkdir -p ~/train-assistant/releases/$RELEASE_SHA && tar -xzf - -C ~/train-assistant/releases/$RELEASE_SHA"
+              "umask 077; mkdir -p ~/apps/train-assistant/releases/$RELEASE_SHA && tar -xzf - -C ~/apps/train-assistant/releases/$RELEASE_SHA"
           ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$target" \
-            "bash ~/train-assistant/releases/$RELEASE_SHA/deploy.sh '$RELEASE_SHA'"
+            "bash ~/apps/train-assistant/releases/$RELEASE_SHA/deploy.sh '$RELEASE_SHA'"
       - name: Check public HTTPS
         env:
           PUBLIC_URL: ${{ vars.PUBLIC_URL }}

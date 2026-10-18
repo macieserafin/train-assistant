@@ -3,7 +3,7 @@ set -euo pipefail
 
 release_sha=${1:?Usage: deploy.sh COMMIT_SHA}
 [[ "$release_sha" =~ ^[0-9a-f]{40}$ ]] || { echo 'Invalid release SHA' >&2; exit 1; }
-app_root="$HOME/train-assistant"
+app_root="$HOME/apps/train-assistant"
 release_dir="$app_root/releases/$release_sha"
 export TRAIN_ENV_FILE="$app_root/.env"
 test -s "$TRAIN_ENV_FILE"
@@ -11,6 +11,11 @@ test -f "$release_dir/image.tar.gz"
 exec 9>"$app_root/deploy.lock"
 flock -w 300 9
 previous=$(readlink -f "$app_root/current" || true)
+mkdir -p "$app_root/images"
+if [[ ! -L "$release_dir/image.tar.gz" ]]; then
+  mv -f "$release_dir/image.tar.gz" "$app_root/images/$release_sha.tar.gz"
+  ln -s "../../images/$release_sha.tar.gz" "$release_dir/image.tar.gz"
+fi
 
 compose() {
   local directory=$1 sha=$2
