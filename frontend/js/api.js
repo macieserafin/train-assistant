@@ -1,5 +1,7 @@
+import { apiBaseUrl } from './config.js';
+
 async function getJson(path, signal) {
-  const response = await fetch(path, { signal });
+  const response = await fetch(`${apiBaseUrl}${path}`, { signal });
   if (!response.ok) throw new Error('Nie udało się pobrać danych. Spróbuj ponownie za chwilę.');
   return response.json();
 }

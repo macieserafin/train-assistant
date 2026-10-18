@@ -42,3 +42,10 @@ api-key-*.txt
 
 # macOS — ignoruj we wszystkich katalogach repozytorium
 .DS_Store
+
+# Frontend: zależności i wygenerowane pliki
+node_modules/
+/frontend/dist/
+
+# Prywatne notatki administracyjne
+/ops/*.local.md

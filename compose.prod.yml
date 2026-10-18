@@ -1,0 +1,24 @@
+services:
+  app:
+    image: train-assistant:${RELEASE_SHA:?Set RELEASE_SHA}
+    restart: unless-stopped
+    init: true
+    env_file:
+      - ${TRAIN_ENV_FILE:?Set TRAIN_ENV_FILE}
+    ports:
+      - "127.0.0.1:18080:8080"
+    mem_limit: 512m
+    cpus: 1.0
+    pids_limit: 128
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

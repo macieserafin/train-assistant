@@ -6,7 +6,7 @@ const files = {
   '/index.html': ['index.html', 'text/html; charset=utf-8'],
 };
 
-for (const name of ['api.js', 'app.js', 'journey.js', 'results.js', 'station-picker.js', 'storage.js']) {
+for (const name of ['api.js', 'app.js', 'config.js', 'journey.js', 'results.js', 'station-picker.js', 'storage.js']) {
   files[`/js/${name}`] = [`js/${name}`, 'text/javascript; charset=utf-8'];
 }
 

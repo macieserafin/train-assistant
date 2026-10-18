@@ -1,0 +1,8 @@
+{
+  "appId": "pl.macieserafin.trainassistant",
+  "appName": "Train Assistant",
+  "webDir": "dist",
+  "ios": {
+    "contentInset": "automatic"
+  }
+}
