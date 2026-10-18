@@ -2,7 +2,6 @@ services:
   app:
     image: train-assistant:${RELEASE_SHA:?Set RELEASE_SHA}
     restart: unless-stopped
-    init: true
     env_file:
       - ${TRAIN_ENV_FILE:?Set TRAIN_ENV_FILE}
     ports:

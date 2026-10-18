@@ -54,3 +54,6 @@ tymczasowym `/tmp`. Wdrożenie jednej instancji powoduje krótką przerwę.
 Stare wydania i obrazy są zachowywane do rollbacku; przy porządkach usuwaj
 wyłącznie stare wydania Train Assistant, zachowując bieżące i poprzednie.
 Nie używaj globalnego `docker system prune` na współdzielonym VPS-ie.
+
+Kontener uruchamia Javę bezpośrednio jako PID 1. Nie dodawaj `init: true`:
+instalacja Docker przez Snap na tym VPS-ie blokuje wykonanie `docker-init`.
