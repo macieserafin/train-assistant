@@ -55,5 +55,8 @@ Stare wydania i obrazy są zachowywane do rollbacku; przy porządkach usuwaj
 wyłącznie stare wydania Train Assistant, zachowując bieżące i poprzednie.
 Nie używaj globalnego `docker system prune` na współdzielonym VPS-ie.
 
-Kontener uruchamia Javę bezpośrednio jako PID 1. Nie dodawaj `init: true`:
-instalacja Docker przez Snap na tym VPS-ie blokuje wykonanie `docker-init`.
+Kontener uruchamia Javę bezpośrednio jako PID 1. Docker Snap na tym VPS-ie
+nie obsługuje przejścia profilu AppArmor kontenera przy `no-new-privileges:true`
+(w dzienniku jądra: `info="no new privs"`). Nie ustawiaj tej opcji: blokuje
+uruchomienie programu. Domyślny profil AppArmor, użytkownik bez roota,
+`cap_drop: ALL` i system plików tylko do odczytu pozostają aktywne.

@@ -14,8 +14,6 @@ services:
       - /tmp:size=64m,mode=1777
     cap_drop:
       - ALL
-    security_opt:
-      - no-new-privileges:true
     logging:
       driver: json-file
       options:
