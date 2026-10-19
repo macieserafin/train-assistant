@@ -1,65 +1,85 @@
-# Train Assistant — WWW i iOS
+# Train Assistant
 
-Produkcja: https://train.macieserafin.pl. Push do `main` automatycznie testuje,
-buduje i wdraża WWW oraz backend na VPS. Szczegóły: [ops/DEPLOYMENT.md](ops/DEPLOYMENT.md).
+**Train Assistant** to aplikacja do wyszukiwania stacji i połączeń kolejowych. Można z niej korzystać w przeglądarce, a ten sam interfejs jest wykorzystywany w aplikacji na iOS.
 
-Jeden frontend HTML/CSS/JavaScript w `frontend/` obsługuje stronę WWW i aplikację
-iOS przez Capacitor 8. Edytuj `index.html`, `js/` i `css/`; katalog `dist/` oraz
-kopie zasobów w projekcie iOS są generowane. Backend Spring Boot pozostaje na VPS-ie.
+**Wersja internetowa:** [train.macieserafin.pl](https://train.macieserafin.pl)
 
-## Wymagania
+## Jak korzystać z aplikacji?
 
-- Node.js 22 lub nowszy i npm.
-- Java 21 lub nowsza do backendu.
-- Do budowania iOS: Mac, pełny Xcode 26+ i obsługa iOS zainstalowana w Xcode.
-  Same Command Line Tools nie wystarczą. Kod WWW można rozwijać także na Windowsie.
+Otwórz [Train Assistant](https://train.macieserafin.pl) w przeglądarce. Nie trzeba niczego instalować.
 
-## Uruchomienie lokalnej strony
+Repozytorium zawiera również projekt iOS, który można samodzielnie zbudować i uruchomić na iPhonie lub w symulatorze za pomocą Xcode.
 
-W pierwszym terminalu, z katalogu `backend/`:
+## Jak zbudowany jest projekt?
+
+Wersja WWW i aplikacja iOS korzystają z **jednego interfejsu w HTML, CSS i JavaScript**, znajdującego się w katalogu `frontend/`. Do przygotowania aplikacji iOS używany jest **Capacitor 8**. Za obsługę żądań API odpowiada **backend Spring Boot**, działający na VPS.
+
+Najważniejsze katalogi i pliki:
+
+- `frontend/index.html`, `frontend/js/`, `frontend/css/` — kod interfejsu.
+- `frontend/ios/` — projekt aplikacji iOS otwierany w Xcode.
+- `backend/` — backend Spring Boot.
+- `ops/DEPLOYMENT.md` — szczegóły wdrożenia i działania środowiska produkcyjnego.
+
+Katalog `frontend/dist/` oraz zasoby w `frontend/ios/App/App/public/` są generowane automatycznie. Zmiany w interfejsie należy wprowadzać w plikach źródłowych, a nie w ich wygenerowanych kopiach.
+
+## Uruchomienie lokalne
+
+### Wymagania
+
+- **Node.js 22+** i npm — do pracy nad frontendem.
+- **Java 21+** — do uruchomienia backendu.
+- **Mac z Xcode 26+** oraz zainstalowaną obsługą iOS — tylko do budowania aplikacji iOS. Same Xcode Command Line Tools nie wystarczą.
+
+Wersję WWW można rozwijać także na Windowsie.
+
+### Start aplikacji
+
+Uruchom backend w pierwszym terminalu, z katalogu `backend/`:
 
 ```sh
 ./mvnw spring-boot:run
 ```
 
-W drugim terminalu, z katalogu `frontend/`:
+W drugim terminalu, z katalogu `frontend/`, uruchom stronę:
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Otwórz http://localhost:5173. Serwer Node przekazuje `/api/*` do
-http://127.0.0.1:8080; przeglądarka nie potrzebuje wtedy CORS.
-Lokalny tryb `dev` zawsze korzysta z tego proxy.
+Aplikacja będzie dostępna pod adresem **http://localhost:5173**.
 
-## Adres backendu na VPS-ie
+Podczas pracy lokalnej serwer frontendu przekazuje żądania `/api/*` do `http://127.0.0.1:8080`. Dzięki temu przeglądarka nie wymaga dodatkowej konfiguracji CORS. Tryb `dev` zawsze używa tego lokalnego proxy.
 
-Skopiuj `frontend/.env.example` do `frontend/.env` i zmień przykład na swój adres:
+## Konfiguracja API
+
+Dla aplikacji iOS oraz wersji WWW korzystającej z API pod osobną domeną należy skonfigurować adres backendu. Skopiuj `frontend/.env.example` do `frontend/.env` i ustaw:
 
 ```dotenv
 API_BASE_URL=https://api.twojadomena.pl
 ```
 
-Wpisz sam adres serwera, bez `/api`. Aplikacja sama dodaje `/api/stations` lub
-`/api/connections`. Backend musi być dostępny przez HTTPS z poprawnym certyfikatem.
-Adres jest publiczną konfiguracją dołączaną do aplikacji; klucz PKP zostaje
-wyłącznie na backendzie. Skrypt budowania nie kopiuje plików `.env`.
+Podaj **sam adres serwera, bez `/api`**. Aplikacja sama tworzy adresy żądań, np. `/api/stations` i `/api/connections`.
 
-Backend domyślnie dopuszcza origin aplikacji iOS `capacitor://localhost`.
-Jeśli strona WWW i API mają różne domeny, ustaw na VPS-ie zmienną środowiskową:
+Ważne informacje:
+
+- Aplikacja iOS wymaga adresu API z poprawnym certyfikatem **HTTPS**. Brak adresu lub użycie HTTP zatrzyma budowanie iOS.
+- Wersja WWW zbudowana bez `API_BASE_URL` korzysta z `/api` pod tą samą domeną co strona. W takim przypadku serwer WWW musi przekazywać żądania do backendu.
+- Zmiana adresu API wymaga ponownego zbudowania WWW lub synchronizacji projektu iOS.
+- Adres API jest publiczną konfiguracją wbudowywaną w aplikację. **Nie należy umieszczać w nim ani w kodzie frontendu kluczy dostępowych.** Klucz PKP pozostaje wyłącznie na backendzie. Pliki `.env` nie są kopiowane do gotowej aplikacji przez skrypt budowania.
+
+Jeśli WWW i API są dostępne pod różnymi domenami, backend musi zezwalać na odpowiedni origin. Przykładowa konfiguracja na VPS-ie:
 
 ```dotenv
 APP_CORS_ALLOWED_ORIGINS=capacitor://localhost,https://twojadomena.pl
 ```
 
-Przy stronie i API pod tym samym adresem dodatkowy origin WWW nie jest potrzebny.
-Reverse proxy (np. Nginx) powinno obsługiwać HTTPS i przekazywać `/api/*` do
-Spring Boot na `127.0.0.1:8080`, zachowując nagłówki CORS oraz żądania OPTIONS.
+Backend domyślnie dopuszcza `capacitor://localhost`. Przy WWW i API pod tym samym adresem dodatkowy origin strony nie jest potrzebny. Reverse proxy (np. Nginx) powinno obsługiwać HTTPS oraz przekazywać `/api/*` do Spring Boot pod `127.0.0.1:8080`, z zachowaniem nagłówków CORS i obsługą żądań `OPTIONS`.
 
-## Aplikacja iOS
+## Uruchomienie aplikacji iOS
 
-Projekt jest w `frontend/ios/`. Z katalogu `frontend/`, po ustawieniu `.env`:
+Na Macu, po ustawieniu `frontend/.env`, wykonaj w katalogu `frontend/`:
 
 ```sh
 npm ci
@@ -67,41 +87,44 @@ npm run ios:sync
 npm run ios:open
 ```
 
-`ios:sync` buduje te same ekrany co WWW i kopiuje je do projektu iOS.
-Brak adresu API lub adres bez HTTPS zatrzymuje budowanie iOS.
-Identyfikator aplikacji to `pl.macieserafin.trainassistant`, a nazwa to
-`Train Assistant` (konfiguracja w `capacitor.config.json`).
+Polecenie `ios:sync` buduje interfejs i kopiuje go do projektu iOS. Następnie w Xcode:
 
-W Xcode:
+1. Dodaj konto Apple w **Settings → Accounts**.
+2. Otwórz **App → Signing & Capabilities**, włącz **Automatically manage signing** i wybierz swój **Team**.
+3. Wybierz symulator lub podłączonego iPhone'a i kliknij **Run**.
+4. Na fizycznym iPhonie, w razie potrzeby, zatwierdź zaufanie do komputera i włącz **Ustawienia → Prywatność i ochrona → Tryb deweloperski**.
 
-1. Dodaj konto Apple w Settings → Accounts.
-2. Wybierz projekt App, target App → Signing & Capabilities.
-3. Włącz Automatically manage signing i wybierz swój Team.
-4. Wybierz symulator lub podłączonego iPhone'a i kliknij Run.
-5. Na fizycznym telefonie zatwierdź zaufanie do Maca i w razie potrzeby włącz
-   Ustawienia → Prywatność i ochrona → Tryb deweloperski.
+Po zmianach w HTML, CSS lub JavaScript ponownie uruchom `npm run ios:sync`, a następnie **Run** w Xcode. Alternatywnie użyj `npm run ios:run`, aby wybrać urządzenie w terminalu.
 
-Po zmianach w HTML/CSS/JS wykonaj ponownie `npm run ios:sync` i Run w Xcode.
-Możesz też użyć `npm run ios:run`, aby wybrać urządzenie z terminala.
-Nie edytuj wygenerowanych plików w `ios/App/App/public/`.
-Przy odtwarzaniu usuniętego projektu iOS służy do tego `npm run ios:add`;
-nie uruchamiaj go, jeśli katalog `ios/` już istnieje.
+Identyfikator aplikacji: `pl.macieserafin.trainassistant`. Nazwa: **Train Assistant**. Obie wartości są zdefiniowane w `frontend/capacitor.config.json`.
 
-## Wersja WWW do wdrożenia
+Polecenie `npm run ios:add` służy wyłącznie do odtworzenia usuniętego projektu iOS. **Nie uruchamiaj go, jeśli katalog `frontend/ios/` już istnieje.**
+
+## Testy i wdrożenie
+
+Testy frontendu (w `frontend/`):
+
+```sh
+npm test
+```
+
+Testy backendu (w `backend/`):
+
+```sh
+./mvnw test
+```
+
+Budowanie wersji WWW (w `frontend/`):
 
 ```sh
 npm run build
 ```
 
-Opublikuj zawartość `frontend/dist/` na serwerze WWW. Build używa
-`API_BASE_URL` z `.env` lub środowiska. Bez tej zmiennej korzysta z `/api`
-pod adresem strony — wtedy skonfiguruj reverse proxy do backendu.
-Zmiana adresu API wymaga ponownego budowania WWW lub synchronizacji iOS.
+Gotowe pliki trafiają do `frontend/dist/` i mogą zostać opublikowane na serwerze WWW.
 
-## Sprawdzenie zmian
+W tym projekcie **push do gałęzi `main` automatycznie uruchamia testy, budowanie oraz wdrożenie WWW i backendu na VPS**. Szczegóły konfiguracji i procesu znajdują się w [dokumentacji wdrożenia](ops/DEPLOYMENT.md).
 
-W `frontend/`: `npm test`. W `backend/`: `./mvnw test`.
+## Dokumentacja technologii
 
-Dokumentacja: [Capacitor](https://capacitorjs.com/docs/getting-started),
-[iOS](https://capacitorjs.com/docs/ios).
-
+- [Capacitor — dokumentacja](https://capacitorjs.com/docs/getting-started)
+- [Capacitor — iOS](https://capacitorjs.com/docs/ios)
